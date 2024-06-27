@@ -1,0 +1,7 @@
+.idea
+*.iml
+.vscode
+
+*.db
+2/node_modules/
+1/out/
