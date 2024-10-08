@@ -1,16 +1,27 @@
-const repository = require("../../dbRepository");
+const express = require('express');
+const repository = require('../../dbRepository');
 
-module.exports = async (req, res) => {
+const router = express.Router();
 
-    const userId = parseInt(req.url.split("/")[2]);
-    const user = await repository.getUserById(userId);
+router.put('/updateUser', async (req, res) => {
+    const { id, name, age } = req.body;
 
-    if (user != null) {
-        res.writeHead(200);
+    const userId = parseInt(id);
+    const userAge = parseInt(age);
+    
+    const userData = { id: userId, name, age: userAge };
 
-        res.end(JSON.stringify(user));            
-    } else {
-        res.writeHead(404);
-        res.end(JSON.stringify({message: "User not found"}));
+    try {
+        const user = await repository.updateUser(userData);
+
+        if (user) {
+            return res.status(200).json(user);
+        } else {
+            return res.status(400).json({ message: "User was not updated due to some reason" });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: "An error occurred while updating the user", error });
     }
-}
+});
+
+module.exports = router;

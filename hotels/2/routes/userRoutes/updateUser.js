@@ -1,32 +1,27 @@
-const repository = require("../../dbRepository");
+const express = require('express');
+const repository = require('../../dbRepository');
 
-const {URLSearchParams} = require("url");
+const router = express.Router();
 
-module.exports = async (req, res) => {
+router.put('/updateUser', async (req, res) => {
+    const { id, name, age } = req.body;
 
-    let requestBody = "";
+    const userId = parseInt(id);
+    const userAge = parseInt(age);
+    
+    const userData = { id: userId, name, age: userAge };
 
-
-    req.on("data", (dataChunk) => {
-        requestBody += dataChunk;
-    });
-
-    req.on("end", async () => {
-        const parsedBody = new URLSearchParams(requestBody);
-        
-        const userId = parseInt(parsedBody.get("id"));
-        const userName = parsedBody.get("name");
-        const userAge = parseInt(parsedBody.get("age"));
-        const userData = {id: userId, name: userName, age: userAge};
-
+    try {
         const user = await repository.updateUser(userData);
 
-        if (user != null) {
-            res.writeHead(200);
-            res.end(JSON.stringify(user));
+        if (user) {
+            return res.status(200).json(user);
         } else {
-            res.writeHead(400);
-            res.end(JSON.stringify({message: "User was not updated due to some reason"}));
+            return res.status(400).json({ message: "User was not updated due to some reason" });
         }
-    });
-}
+    } catch (error) {
+        return res.status(500).json({ message: "An error occurred while updating the user", error });
+    }
+});
+
+module.exports = router;

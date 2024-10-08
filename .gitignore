@@ -5,3 +5,8 @@
 *.db
 node_modules/
 out/
+
+env/
+media/
+yolov5/
+*.pt
